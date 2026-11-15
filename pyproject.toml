@@ -26,7 +26,8 @@ dev = [
 packages = ["residency_match"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["tests", "residency_match"]
+addopts = "--doctest-modules"
 
 [tool.ruff]
 target-version = "py313"
