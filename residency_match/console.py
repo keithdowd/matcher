@@ -195,5 +195,7 @@ class ConsoleReporter:
             The process exit status.
         """
         for path in paths:
-            self._console.print(f"Wrote {path}", markup=False, highlight=False)
+            self._console.print(
+                f"Wrote {path}", markup=False, highlight=False, soft_wrap=True
+            )
         self._console.print(f"Exit status: {exit_status}", markup=False)
