@@ -22,7 +22,7 @@ class Matching:
     ----------
     pairs : Iterable[tuple[str, str]]
         ``(applicant_id, program_id)`` pairs. Each applicant may appear at
-        most once; applicants left out are unmatched.
+        most once in a valid matching; applicants left out are unmatched.
 
     Attributes
     ----------
@@ -30,10 +30,11 @@ class Matching:
         The pairs sorted by applicant id. Two matchings are equal exactly when
         their pairs are equal.
 
-    Raises
-    ------
-    ValueError
-        If an applicant appears in more than one pair.
+    Notes
+    -----
+    Duplicate applicants are deliberately *not* rejected here, so that the
+    validator's single-match check can detect them independently of the
+    algorithm. ``program_of`` returns the first pair in sorted order.
 
     Examples
     --------
@@ -53,9 +54,9 @@ class Matching:
     def __init__(self, pairs: Iterable[tuple[str, str]]) -> None:
         """Sort the pairs and build lookups in both directions."""
         ordered = tuple(sorted(pairs))
-        program_of = dict(ordered)
-        if len(program_of) != len(ordered):
-            raise ValueError("an applicant appears in more than one pair")
+        program_of: dict[str, str] = {}
+        for applicant_id, program_id in ordered:
+            program_of.setdefault(applicant_id, program_id)
         holders: dict[str, list[str]] = {}
         for applicant_id, program_id in ordered:
             holders.setdefault(program_id, []).append(applicant_id)

@@ -23,10 +23,11 @@ def test_matching_lookups_and_equality() -> None:
     assert m == Matching([("A", "P"), ("B", "P"), ("C", "Q")])
 
 
-def test_matching_rejects_double_match() -> None:
-    """An applicant in two pairs is refused."""
-    with pytest.raises(ValueError):
-        Matching([("A", "P"), ("A", "Q")])
+def test_matching_keeps_duplicates_for_the_validator() -> None:
+    """An applicant in two pairs is kept so SingleMatchCheck can flag it."""
+    m = Matching([("A", "Q"), ("A", "P")])
+    assert m.pairs == (("A", "P"), ("A", "Q"))
+    assert m.program_of("A") == "P"
 
 
 def test_to_matches_attaches_ranks() -> None:
