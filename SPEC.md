@@ -332,3 +332,4 @@ These choices were made while building version 1 (completed 2026-11-15). Where t
 - A lint error that reached the step 6 commit was fixed and the commit amended.
 - Exit code 1 cannot be produced by the real matcher, so its test replaces DeferredAcceptance with a broken stand-in in-process. Exit codes 0, 2 and 3 are tested in subprocesses.
 - The build log in the Build plan section shows each step's completion date and implementation notes.
+- ALGORITHM.md explains the deferred acceptance implementation, how implementation details affect outputs, and alternative approaches.

@@ -66,7 +66,8 @@ pytest
 
 `pytest` also runs the docstring examples. The design is in
 [SPEC.md](SPEC.md),
-including the build log.
+including the build log. How the algorithm works, and what else could have been
+done, is in [ALGORITHM.md](ALGORITHM.md).
 
 ## Layout
 

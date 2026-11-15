@@ -2,7 +2,8 @@
 
 This guide explains how to run the residency match simulator and lists features
 worth testing. Run the commands from the project folder with the virtual
-environment active (see the README for install steps).
+environment active (see the README for install steps). For how the matching
+algorithm works, see [ALGORITHM.md](ALGORITHM.md).
 
 ## 1. The two commands
 
