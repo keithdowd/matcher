@@ -65,7 +65,7 @@ pytest
 ```
 
 `pytest` also runs the docstring examples. The design is in
-[Residency Match Simulator Version 1 Design.md](<Residency Match Simulator Version 1 Design.md>),
+[SPEC.md](SPEC.md),
 including the build log.
 
 ## Layout
