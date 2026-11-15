@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "residency-match"
+version = "0.1.0"
+description = "Residency match simulator: seeded mock data, deferred acceptance, validation."
+requires-python = "==3.13.*"
+dependencies = [
+    "numpy==2.5.4",
+    "pandas==3.1.1",
+    "rich==15.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==9.2.0",
+    "hypothesis==6.170.15",
+    "ruff==0.17.5",
+    "mypy==2.4.1",
+    "pandas-stubs==3.1.0.261029",
+]
+
+[tool.setuptools]
+packages = ["residency_match"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "D"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["D100", "D104"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+plugins = []
