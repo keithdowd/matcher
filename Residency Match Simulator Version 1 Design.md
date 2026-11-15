@@ -297,3 +297,38 @@ These decisions are settled for version 1.
 - Git: step 1 initializes the repository, and each step is committed with an informative message. Keith Dowd is the only commit author. Commit messages carry no tool or co-author attribution. There is no remote and nothing is pushed.
 - Generator list lengths: if applicant\_list\_length exceeds the number of programs, or program\_list\_length exceeds the number of applicants, the generator clamps to the available count. The effective values are recorded in run\_metadata.json.
 - Dependency pinning: create a virtual environment with Python 3.13.6, install the latest releases of every package, and pin the exact installed versions with == in pyproject.toml and requirements.txt.
+
+## Implementation decisions and refactors
+
+These choices were made while building version 1 (completed 2026-11-15). Where they differ from the sections above, this list is what the code does.
+
+### Additions to the design
+
+- ReproducibilityCheck is a fifth check class in checks.py. The Code structure table lists only four checks, but the validation table lists five. It re-runs DeferredAcceptance on the same Market and compares the matchings.
+- CheckResult (check name plus its issues, with a passed property) is a new frozen dataclass in checks.py. Validator.run returns a list of them so the writer can emit one PASS or FAIL row per check. Validator.default() builds the standard five-check validator.
+- CsvMarketWriter in io.py writes the four input files for the generator. io.py also has write\_metadata, read\_seed and environment\_versions helpers shared by the generator and the match command.
+- generate.py has generate\_files, which writes the files, reloads them with CsvMarketLoader, and only then writes run\_metadata.json. MockGenerator.effective\_lengths holds the clamping rule.
+- ValidationIssue has the fields source, detail and an optional row. The source is a file name for input problems and a check name for validation problems.
+- The generate command has a --force flag. Without a terminal, a non-empty output directory is a usage error unless --force is given. In a terminal the user is asked to confirm.
+- The generate command accepts all generator parameters as flags (--capacity-min, --capacity-max, --applicant-list-length, --program-list-length and the counts), and a terminal prompts for any left out, with Enter accepting the default. Required values (--seed, --out, --input) are only listed as missing when there is no terminal.
+- Generated ids are A001.. and P01.., widened when the count needs more digits so ids sort numerically.
+- pandas-stubs is a development dependency, needed for mypy strict mode. pytest runs with --doctest-modules over the package, so docstring examples are tested.
+
+### Changes to specified behavior
+
+- Matching does not reject an applicant who appears in two pairs. It keeps both so SingleMatchCheck can detect the problem independently of the algorithm. program\_of returns the first pair in sorted order.
+- validation.csv writes an extra FAIL row for each problem found by any failing check, not only Stability. Stability rows carry the applicant and program ids in the detail text.
+- The Reproducibility check re-runs the matcher on the loaded market. It does not regenerate data from the seed.
+- Market has a hand-written \_\_init\_\_ on a frozen dataclass. It validates ids and lists, stores read-only copies, and builds the rank lookups once. Applicants and programs missing from the list mappings get empty lists.
+- Run timestamps are injected through a clock parameter, so tests are deterministic. The match command's metadata records the seed read from the input directory's run\_metadata.json, or null.
+- The fill bar in the programs table is ASCII (# and -) so logs and legacy terminals render it.
+- Input errors print to stderr and are never suppressed by --quiet. The footer uses soft wrapping so long paths stay on one line.
+
+### Refactors and fixes during the build
+
+- errors.py imports ValidationIssue only under TYPE\_CHECKING, because models.py imports errors.py at runtime for UsageError. This avoids a circular import.
+- The loader builds its reference id sets from the raw id columns, so one bad row does not trigger follow-on unknown-id errors in the rankings files. A file that cannot be read skips the checks that depend on it.
+- The brute-force oracle in tests/helpers.py had a bug on zero-capacity programs (it took the maximum of an empty list). It was fixed in the test helper; the production code was not affected.
+- A lint error that reached the step 6 commit was fixed and the commit amended.
+- Exit code 1 cannot be produced by the real matcher, so its test replaces DeferredAcceptance with a broken stand-in in-process. Exit codes 0, 2 and 3 are tested in subprocesses.
+- The build log in the Build plan section shows each step's completion date and implementation notes.
